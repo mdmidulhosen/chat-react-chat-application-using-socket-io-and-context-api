@@ -7,6 +7,7 @@ const GlobalState = ({children}) => {
   const [currentUserName, setCurrentUserName] = useState('');
   const [currentUser, setCurrentUser] = useState('');
   const [allUser, setAllUser] = useState([]);
+  const [currentGroupName, setCurrentGroupName] = useState("");
   return (
     <GlobalContext.Provider
       value={{
@@ -18,6 +19,8 @@ const GlobalState = ({children}) => {
         setCurrentUser,
         allUser,
         setAllUser,
+        currentGroupName,
+        setCurrentGroupName,
       }}>
       {children}
     </GlobalContext.Provider>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useContext, useState} from 'react';
 import {
   Alert,
   Modal,
@@ -8,10 +8,20 @@ import {
   View,
   Dimensions,
   TextInput,
+  Keyboard,
 } from 'react-native';
+import {GlobalContext} from '../context';
 const {width, height} = Dimensions.get('screen');
 
 const ModalComponent = ({modalVisible, setModalVisible}) => {
+  const {currentGroupName, setCurrentGroupName} = useContext(GlobalContext);
+
+  const handleCreateRoom = () => {
+    console.log(currentGroupName);
+    setModalVisible(false);
+    setCurrentGroupName('');
+    Keyboard.dismiss();
+  };
   return (
     <View style={styles.centeredView}>
       <Modal
@@ -24,9 +34,15 @@ const ModalComponent = ({modalVisible, setModalVisible}) => {
         }}>
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <TextInput placeholder='Your Group Name' style={styles.input} placeholderTextColor="#703efe"/>
+            <TextInput
+              placeholder="Your Group Name"
+              onChangeText={value => setCurrentGroupName(value)}
+              value={currentGroupName}
+              style={styles.input}
+              placeholderTextColor="#703efe"
+            />
             <View style={styles.betweenJustify}>
-              <Pressable onPress={() => console.log("Add Group Pressed")}>
+              <Pressable onPress={handleCreateRoom}>
                 <Text style={styles.buttonClose}>Add</Text>
               </Pressable>
               <Pressable onPress={() => setModalVisible(!modalVisible)}>
@@ -88,7 +104,7 @@ const styles = StyleSheet.create({
   betweenJustify: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    width:'100%'
+    width: '100%',
   },
   input: {
     borderColor: '#703efe',
@@ -96,7 +112,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 14,
     paddingLeft: 20,
-    width:'100%'
+    width: '100%',
   },
 });
 

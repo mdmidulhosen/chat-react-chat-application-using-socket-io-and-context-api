@@ -22,7 +22,10 @@ const ChatScreen = () => {
         <Text>{currentUser}</Text>
         <AndIcon name="logout" color="#703efe" size={26} />
       </View>
-      <ModalComponent modalVisible={modalVisible} setModalVisible={setModalVisible}/>
+      <ModalComponent
+        modalVisible={modalVisible}
+        setModalVisible={setModalVisible}
+      />
       <TouchableOpacity onPress={() => setModalVisible(true)}>
         <Text style={styles.button}>Create a new group</Text>
       </TouchableOpacity>
