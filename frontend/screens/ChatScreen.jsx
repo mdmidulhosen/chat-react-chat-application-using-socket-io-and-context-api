@@ -4,24 +4,77 @@ import {
   StyleSheet,
   Dimensions,
   TouchableOpacity,
+  FlatList,
 } from 'react-native';
-import React, {useContext, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import AndIcon from 'react-native-vector-icons/AntDesign';
-import GlobalState, {GlobalContext} from '../context';
+import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {GlobalContext} from '../context';
 import ModalComponent from '../components/Modal';
+import {socket} from '../utils';
+
 const {width, height} = Dimensions.get('screen');
 
 const ChatScreen = () => {
-  const {currentUser} = useContext(GlobalContext);
+  const {currentUser, allChatRooms, setAllChatRooms} =
+    useContext(GlobalContext);
   const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    const getGroups = async () => {
+      try {
+        socket.emit('getAllGroups');
+        socket.on('groupList', groups => {
+          console.log('Received group list: ', groups);
+          setAllChatRooms(groups);
+        });
+      } catch (error) {
+        console.error('Error fetching groups: ', error);
+      }
+    };
+
+    getGroups();
+    return () => {
+      socket.off('groupList');
+    };
+  }, [socket]);
+
+  const handlePress = item => {
+    console.log('Selected Item:', item);
+  };
+
+  const renderItem = ({item}) => (
+    <TouchableOpacity
+      onPress={() => handlePress(item)}
+      style={styles.itemContainer}>
+      <MCIcon
+        name="account-circle"
+        size={50}
+        color="#703efe"
+        style={styles.icon}
+      />
+      <View style={styles.textContainer}>
+        <View style={styles.header}>
+          <Text style={styles.groupName}>{item.groupName}</Text>
+          <Text style={styles.timestamp}>10:30 AM</Text>
+        </View>
+        <Text style={styles.messagePreview}>Hello, How are you?</Text>
+      </View>
+    </TouchableOpacity>
+  );
 
   return (
     <View style={styles.mainWrapper}>
       <View style={styles.betweenWrapper}>
         <View></View>
-        <Text>{currentUser}</Text>
+        <Text style={styles.title}>{currentUser}</Text>
         <AndIcon name="logout" color="#703efe" size={26} />
       </View>
+      <FlatList
+        data={allChatRooms}
+        renderItem={renderItem}
+        keyExtractor={item => item.id}
+      />
       <ModalComponent
         modalVisible={modalVisible}
         setModalVisible={setModalVisible}
@@ -78,7 +131,7 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
   },
   title: {
-    color: '#000000',
+    color: '#703efe',
     fontSize: 26,
     textAlign: 'center',
     fontWeight: '700',
@@ -89,6 +142,35 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
     textAlign: 'center',
+  },
+  itemContainer: {
+    flexDirection: 'row',
+    padding: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  icon: {
+    marginRight: 15,
+  },
+  textContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  groupName: {
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  timestamp: {
+    color: '#999',
+    fontSize: 12,
+  },
+  messagePreview: {
+    color: '#666',
+    marginTop: 5,
   },
 });
 export default ChatScreen;
