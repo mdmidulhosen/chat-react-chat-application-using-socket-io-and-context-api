@@ -18,7 +18,6 @@ const ModalComponent = ({modalVisible, setModalVisible}) => {
   const {currentGroupName, setCurrentGroupName} = useContext(GlobalContext);
 
   const handleCreateRoom = () => {
-    console.log(currentGroupName);
     socket.emit('createNewGroup', currentGroupName)
     setModalVisible(false);
     setCurrentGroupName('');

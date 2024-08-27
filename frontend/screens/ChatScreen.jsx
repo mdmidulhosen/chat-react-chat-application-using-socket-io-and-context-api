@@ -12,20 +12,26 @@ import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {GlobalContext} from '../context';
 import ModalComponent from '../components/Modal';
 import {socket} from '../utils';
+import {useNavigation} from '@react-navigation/native';
 
 const {width, height} = Dimensions.get('screen');
 
 const ChatScreen = () => {
-  const {currentUser, allChatRooms, setAllChatRooms} =
-    useContext(GlobalContext);
+  const {
+    currentUser,
+    allChatRooms,
+    setAllChatRooms,
+    setCurrentUser,
+    setShowLoginView,
+  } = useContext(GlobalContext);
   const [modalVisible, setModalVisible] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const getGroups = async () => {
       try {
         socket.emit('getAllGroups');
         socket.on('groupList', groups => {
-          console.log('Received group list: ', groups);
           setAllChatRooms(groups);
         });
       } catch (error) {
@@ -39,13 +45,20 @@ const ChatScreen = () => {
     };
   }, [socket]);
 
-  const handlePress = item => {
-    console.log('Selected Item:', item);
+  const handleChatItemPress = item => {
+    navigation.navigate('Message', {
+      groupId: item.id,
+      groupName: item.groupName,
+    });
+  };
+  const handleLogout = () => {
+    setCurrentUser('');
+    setShowLoginView(false);
   };
 
   const renderItem = ({item}) => (
     <TouchableOpacity
-      onPress={() => handlePress(item)}
+      onPress={() => handleChatItemPress(item)}
       style={styles.itemContainer}>
       <MCIcon
         name="account-circle"
@@ -63,14 +76,31 @@ const ChatScreen = () => {
     </TouchableOpacity>
   );
 
+  useEffect(() => {
+    if (currentUser.trim() === '') {
+      navigation.navigate('Home');
+    }
+  }, [currentUser]);
+
   return (
     <View style={styles.mainWrapper}>
       <View style={styles.betweenWrapper}>
-        <View></View>
+        <TouchableOpacity
+          onPress={() => console.log('will go to profile screen')}>
+          <MCIcon
+            name="account-circle"
+            size={35}
+            color="#703efe"
+            style={styles.icon}
+          />
+        </TouchableOpacity>
         <Text style={styles.title}>{currentUser}</Text>
-        <AndIcon name="logout" color="#703efe" size={26} />
+        <TouchableOpacity onPress={handleLogout}>
+          <AndIcon name="logout" color="#703efe" size={26} />
+        </TouchableOpacity>
       </View>
       <FlatList
+        showsVerticalScrollIndicator={false}
         data={allChatRooms}
         renderItem={renderItem}
         keyExtractor={item => item.id}
