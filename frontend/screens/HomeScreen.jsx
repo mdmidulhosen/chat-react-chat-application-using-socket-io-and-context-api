@@ -13,9 +13,12 @@ import {
 import React, {useContext} from 'react';
 import homeImage from '../assets/images/home-image.jpg';
 import {GlobalContext} from '../context';
-const {height, width} = Dimensions.get('screen');
+import {useNavigation} from '@react-navigation/native';
 
 const HomeScreen = () => {
+  const {height, width} = Dimensions.get('screen');
+  const navigation = useNavigation();
+
   const {
     showLoginView,
     setShowLoginView,
@@ -35,13 +38,15 @@ const HomeScreen = () => {
         if (index === -1) {
           Alert.alert('Please Register First.');
         } else {
-          setCurrentUser(setCurrentUserName);
+          setCurrentUser(currentUserName);
+          navigation.navigate('Chat');
         }
       } else {
         if (index === -1) {
-          allUser.push(currentUserName);
-          setAllUser(allUser);
-          setCurrentUser(setCurrentUserName);
+          const updatedAllUser = [...allUser, currentUserName];
+          setAllUser(updatedAllUser);
+          setCurrentUser(currentUserName);
+          navigation.navigate('Chat');
         } else {
           Alert.alert('Already registered, please login!');
         }
@@ -52,6 +57,7 @@ const HomeScreen = () => {
     }
     Keyboard.dismiss();
   };
+
   return (
     <View style={styles.mainWrapper}>
       <ImageBackground style={styles.homeImage} source={homeImage} />
