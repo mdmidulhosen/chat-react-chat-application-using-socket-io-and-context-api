@@ -13,10 +13,10 @@ import {
 import React, {useContext} from 'react';
 import homeImage from '../assets/images/home-image.jpg';
 import {GlobalContext} from '../context';
-import {useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native'
+const {height, width} = Dimensions.get('screen');
 
 const HomeScreen = () => {
-  const {height, width} = Dimensions.get('screen');
   const navigation = useNavigation();
 
   const {
@@ -86,9 +86,11 @@ const HomeScreen = () => {
             <Text style={styles.subTitle}>
               Connect with people around the world for free
             </Text>
-            <Pressable onPress={() => setShowLoginView(true)}>
+            <View style={{flexDirection:'row', justifyContent:'center'}}>
+            <Pressable onPress={() => setShowLoginView(true)} style={{width: width *0.4,}}>
               <Text style={styles.button}>Get Started</Text>
             </Pressable>
+            </View>
           </View>
         )}
       </View>
@@ -121,8 +123,8 @@ const styles = StyleSheet.create({
     color: 'white',
     textAlign: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 70,
     borderRadius: 12,
+    width: width * 0.4
   },
   betweenWrapper: {
     flexDirection: 'row',
