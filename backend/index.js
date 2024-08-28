@@ -10,6 +10,9 @@ const socketIO = require("socket.io")(http, {
 
 const port = process.env.PORT || 4000;
 let chatGroups = [];
+const uniqueId = () => {
+  return Math.random().toString(36).slice(2, 11) + Date.now().toString(36);
+};
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -23,9 +26,35 @@ socketIO.on("connection", (socket) => {
   });
 
   socket.on("createNewGroup", (groupName) => {
-    console.log("group name is: ", groupName);
-    chatGroups.unshift({ id: chatGroups.length + 1, groupName, message: [] });
+    const newGroup = {
+      id: uniqueId(),
+      groupName,
+      messages: []
+    };
+    chatGroups.unshift(newGroup);
     socket.emit("groupList", chatGroups);
+  });
+
+  socket.on("newChatMessage", (data) => {
+    const { currentUser, message, timeData, groupId } = data;
+    const filterGroup = chatGroups.find((item) => item.id === groupId);
+  
+    if (filterGroup) {
+      if (message.trim() === '') {
+        return; 
+      }
+  
+      const newMessage = {
+        id: uniqueId(),
+        text: message,
+        currentUser,
+        time: `${timeData.hr}:${timeData.mins}`
+      };
+  
+      filterGroup.messages.push(newMessage); 
+      socketIO.to(groupId).emit("groupMessage", newMessage); 
+      socket.emit("foundGroup", filterGroup.messages); 
+    }
   });
 });
 

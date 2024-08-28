@@ -1,3 +1,4 @@
+import React, {useContext, useEffect, useState} from 'react';
 import {
   View,
   Text,
@@ -6,7 +7,6 @@ import {
   TouchableOpacity,
   FlatList,
 } from 'react-native';
-import React, {useContext, useEffect, useState} from 'react';
 import AndIcon from 'react-native-vector-icons/AntDesign';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {GlobalContext} from '../context';
@@ -45,12 +45,19 @@ const ChatScreen = () => {
     };
   }, [socket]);
 
-  const handleChatItemPress = item => {
+  useEffect(() => {
+    if (currentUser.trim() === '') {
+      navigation.navigate('Home');
+    }
+  }, [currentUser]);
+
+  const handleChatItemPress = (item) => {
     navigation.navigate('Message', {
       groupId: item.id,
       groupName: item.groupName,
     });
   };
+
   const handleLogout = () => {
     setCurrentUser('');
     setShowLoginView(false);
@@ -76,12 +83,6 @@ const ChatScreen = () => {
     </TouchableOpacity>
   );
 
-  useEffect(() => {
-    if (currentUser.trim() === '') {
-      navigation.navigate('Home');
-    }
-  }, [currentUser]);
-
   return (
     <View style={styles.mainWrapper}>
       <View style={styles.betweenWrapper}>
@@ -103,7 +104,7 @@ const ChatScreen = () => {
         showsVerticalScrollIndicator={false}
         data={allChatRooms}
         renderItem={renderItem}
-        keyExtractor={item => item.id}
+        keyExtractor={item => item.id.toString()} // Ensure IDs are strings
       />
       <ModalComponent
         modalVisible={modalVisible}
@@ -123,22 +124,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingBottom: 10,
   },
-  homeImage: {
-    flex: 2,
-    width: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  content: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    paddingHorizontal: 20,
-    overflow: 'hidden',
-    zIndex: 10,
-  },
   button: {
     backgroundColor: '#703efe',
     color: 'white',
@@ -153,25 +138,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
-  input: {
-    borderColor: '#703efe',
-    borderWidth: 2,
-    borderRadius: 12,
-    marginBottom: 4,
-    paddingLeft: 20,
-  },
   title: {
     color: '#703efe',
     fontSize: 26,
     textAlign: 'center',
     fontWeight: '700',
     marginBottom: 10,
-  },
-  subTitle: {
-    color: '#cccccc',
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
   },
   itemContainer: {
     flexDirection: 'row',
@@ -203,4 +175,5 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 });
+
 export default ChatScreen;
