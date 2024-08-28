@@ -26,6 +26,7 @@ const MessageScreen = () => {
   const {message, setMessage, messages, setMessages, currentUser, allUser} =
     useContext(GlobalContext);
 
+
   const sendMessage = () => {
     if (message.trim()) {
       const newMessage = {id: (messages.length + 1).toString(), text: message};
@@ -54,16 +55,7 @@ const MessageScreen = () => {
     }
   };
 
-  // useEffect(() => {
-  //   // Scroll to the end when the component mounts or when messages change
-  //   if (flatListRef.current) {
-  //     flatListRef.current.scrollToEnd({ animated: true });
-  //   }
-  // }, [messages]);
-
   useEffect(() => {
-    sendMessage();
-    console.log("object")
     socket.emit('findGroup', groupId);
     const handleFoundGroup = allChats => {
       setMessages(allChats);
@@ -73,14 +65,6 @@ const MessageScreen = () => {
       socket.off('foundGroup', handleFoundGroup);
     };
   }, [groupId]);
-
-  // Separate messages from currentUser and others
-  const currentUserMessages = messages.filter(
-    msg => msg.currentUser === currentUser,
-  );
-  const othersMessages = messages.filter(
-    msg => msg.currentUser !== currentUser,
-  );
 
   const renderMessageItem = ({item}) => {
     const isCurrentUser = item.currentUser === currentUser;
@@ -131,8 +115,8 @@ const MessageScreen = () => {
         />
         <Pressable
           onPress={sendMessage}
-          style={[styles.sendButton, {opacity: message.trim() ? 1 : 0.5}]}
-          disabled={!message.trim()}>
+          style={[styles.sendButton]}
+          >
           <IonIcon name="send" size={26} color="#fff" />
         </Pressable>
       </View>
